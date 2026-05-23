@@ -1,0 +1,63 @@
+name: Reusable — Build, Push & Deploy to Zeabur
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: string
+        default: '21'
+      service-name:
+        description: 'e.g. finance-gateway — used as the Docker image name'
+        type: string
+        required: true
+    secrets:
+      ZEABUR_API_TOKEN:
+        required: true
+      ZEABUR_SERVICE_ID:
+        required: true
+      ZEABUR_PROJECT_ID:
+        required: true
+
+jobs:
+  build-and-deploy:
+    name: Build, Push & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ inputs.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build jar (skip tests — already passed in CI)
+        run: mvn package -DskipTests --no-transfer-progress
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ inputs.service-name }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ inputs.service-name }}:${{ github.sha }}
+
+      - name: Deploy to Zeabur
+        run: |
+          curl -s -X POST https://gateway.zeabur.com/graphql \
+            -H "Authorization: Bearer ${{ secrets.ZEABUR_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation { redeployService(projectID: \"${{ secrets.ZEABUR_PROJECT_ID }}\", serviceID: \"${{ secrets.ZEABUR_SERVICE_ID }}\") }"
+            }'
