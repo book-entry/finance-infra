@@ -5,7 +5,7 @@ on:
     inputs:
       java-version:
         type: string
-        default: '21'
+        default: "21"
 
 jobs:
   build:
@@ -22,6 +22,21 @@ jobs:
           java-version: ${{ inputs.java-version }}
           distribution: temurin
           cache: maven
+
+      - name: Configure Maven settings for GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
 
       - name: Compile
         run: mvn compile --no-transfer-progress
@@ -42,5 +57,28 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Configure Maven settings for GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
       - name: Run JUnit tests
         run: mvn test --no-transfer-progress
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+          retention-days: 7
