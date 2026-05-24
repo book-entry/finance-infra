@@ -23,15 +23,6 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Verify Secret Length
-        env:
-          USER: ${{ secrets.PACKAGE_USER }}
-          TOKEN: ${{ secrets.PACKAGES_TOKEN }}
-        run: |
-          echo "User string length: ${#USER}"
-          echo "Token string length: ${#TOKEN}"
-          if [ ${#TOKEN} -le 0 ]; then echo "ERROR: TOKEN IS EMPTY!"; exit 1; fi
-
       - name: Compile
         env:
           GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
