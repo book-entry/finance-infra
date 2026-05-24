@@ -51,13 +51,16 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ inputs.java-version }}
-          distribution: temurin
+          distribution:
+            temurin
+            # 1. 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
+          server-id: github
+          # 2. 透過這兩個設定，setup-java 會自動幫您寫入臨時產生的 settings.xml
+          server-username: ${{ inputs.server-username }}
+          server-password: ${{ inputs.server-password }}
           cache: maven
 
       - name: Run JUnit tests
-        env:
-          GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
-          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
         run: mvn test --no-transfer-progress
 
       - name: Upload test reports
