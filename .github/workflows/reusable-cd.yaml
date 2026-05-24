@@ -42,8 +42,8 @@ jobs:
             <servers>
               <server>
                 <id>github</id>
-                <username>${{ secrets.PACKAGE_USER }}</username>
-                <password>${{ secrets.PACKAGES_TOKEN }}</password>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
               </server>
             </servers>
           </settings>
@@ -56,8 +56,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ secrets.PACKAGE_USER }}
-          password: ${{ secrets.PACKAGES_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
