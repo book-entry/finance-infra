@@ -23,16 +23,14 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Debug Settings XML
-        run: cat ~/.m2/settings.xml
-
-      - name: Test Token with Curl
+      - name: Verify Secret Length
         env:
           USER: ${{ secrets.PACKAGE_USER }}
           TOKEN: ${{ secrets.PACKAGES_TOKEN }}
         run: |
-          # 使用你的 Token 嘗試直接下載 Maven 的 metadata 檔案
-          curl -v -u "$USER:$TOKEN" https://github.com
+          echo "User string length: ${#USER}"
+          echo "Token string length: ${#TOKEN}"
+          if [ ${#TOKEN} -le 0 ]; then echo "ERROR: TOKEN IS EMPTY!"; exit 1; fi
 
       - name: Compile
         env:
