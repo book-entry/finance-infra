@@ -24,17 +24,20 @@ jobs:
       - name: Set up Java ${{ inputs.java-version }}
         uses: actions/setup-java@v4
         with:
-          java-version:
-            ${{ inputs.java-version }}
-            # 1. 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
-          server-id: github
-          # 2. 透過這兩個設定，setup-java 會自動幫您寫入臨時產生的 settings.xml
-          server-username: ${{ secrets.server-username }}
-          server-password: ${{ secrets.server-password }}
+          java-version: ${{ inputs.java-version }}
           distribution: temurin
           cache: maven
+          # 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
+          server-id: github
+          # server-username / server-password 要填「環境變數名稱」，不是秘密值本身
+          # setup-java 會產生 <username>${env.MAVEN_USERNAME}</username>，Maven 執行時再從環境變數解析
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Compile
+        env:
+          MAVEN_USERNAME: ${{ secrets.server-username }}
+          MAVEN_PASSWORD: ${{ secrets.server-password }}
         run: cat ~/.m2/settings.xml && mvn compile --no-transfer-progress
 
   test:
@@ -50,16 +53,18 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ inputs.java-version }}
-          distribution:
-            temurin
-            # 1. 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
-          server-id: github
-          # 2. 透過這兩個設定，setup-java 會自動幫您寫入臨時產生的 settings.xml
-          server-username: ${{ secrets.server-username }}
-          server-password: ${{ secrets.server-password }}
+          distribution: temurin
           cache: maven
+          # 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
+          server-id: github
+          # server-username / server-password 要填「環境變數名稱」，不是秘密值本身
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Run JUnit tests
+        env:
+          MAVEN_USERNAME: ${{ secrets.server-username }}
+          MAVEN_PASSWORD: ${{ secrets.server-password }}
         run: mvn test --no-transfer-progress
 
       - name: Upload test reports
