@@ -6,6 +6,12 @@ on:
       java-version:
         type: string
         default: "21"
+      server-username:
+        type: string
+        required: true
+      server-password:
+        type: string
+        required: true
 
 jobs:
   build:
@@ -24,8 +30,8 @@ jobs:
             # 1. 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
           server-id: github
           # 2. 透過這兩個設定，setup-java 會自動幫您寫入臨時產生的 settings.xml
-          server-username: ${{ secrets.PACKAGE_USER }}
-          server-password: ${{ secrets.PACKAGES_TOKEN }}
+          server-username: ${{ inputs.server-username }}
+          server-password: ${{ inputs.server-password }}
           distribution: temurin
           cache: maven
 
