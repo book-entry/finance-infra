@@ -69,10 +69,13 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/${{ inputs.service-name }}:${{ github.sha }}
 
       - name: Deploy to Zeabur
+        env:
+          ZEABUR_API_TOKEN: ${{ secrets.ZEABUR_API_TOKEN }}
+          ZEABUR_PROJECT_ID: ${{ secrets.ZEABUR_PROJECT_ID }}
+          ZEABUR_SERVICE_ID: ${{ secrets.ZEABUR_SERVICE_ID }}
         run: |
-          curl -s -X POST https://gateway.zeabur.com/graphql \
-            -H "Authorization: Bearer ${{ secrets.ZEABUR_API_TOKEN }}" \
+          curl --fail-with-body --show-error -w "\nHTTP %{http_code}\n" \
+            -X POST https://api.zeabur.com/graphql \
+            -H "Authorization: Bearer ${ZEABUR_API_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "query": "mutation { redeployService(projectID: \"${{ secrets.ZEABUR_PROJECT_ID }}\", serviceID: \"${{ secrets.ZEABUR_SERVICE_ID }}\") }"
-            }'
+            -d "{\"query\": \"mutation { redeployService(projectID: \\\"${ZEABUR_PROJECT_ID}\\\", serviceID: \\\"${ZEABUR_SERVICE_ID}\\\") }\"}"
