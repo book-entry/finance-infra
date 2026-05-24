@@ -23,42 +23,10 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Configure Maven settings for GitHub Packages
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${ secrets.PACKAGE_USER }</username>
-                <password>${ secrets.PACKAGES_TOKEN }</password>
-              </server>
-            </servers>
-
-            <profiles>
-              <profile>
-                <id>github-packages</id>
-                <repositories>
-                  <repository>
-                    <id>github</id>
-                    <name>GitHub Packages</name>
-                    <url>https://maven.pkg.github.com/book-entry/finance-common</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                  </repository>
-                </repositories>
-              </profile>
-            </profiles>
-
-            <!-- activate the profile for every build automatically -->
-            <activeProfiles>
-              <activeProfile>github-packages</activeProfile>
-            </activeProfiles>
-          </settings>
-          EOF
-
       - name: Compile
+        env:
+          GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
         run: mvn compile --no-transfer-progress
 
   test:
@@ -77,42 +45,10 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Configure Maven settings for GitHub Packages
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${ secrets.PACKAGE_USER }</username>
-                <password>${ secrets.PACKAGES_TOKEN }</password>
-              </server>
-            </servers>
-
-            <profiles>
-              <profile>
-                <id>github-packages</id>
-                <repositories>
-                  <repository>
-                    <id>github</id>
-                    <name>GitHub Packages</name>
-                    <url>https://maven.pkg.github.com/book-entry/finance-common</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                  </repository>
-                </repositories>
-              </profile>
-            </profiles>
-
-            <!-- activate the profile for every build automatically -->
-            <activeProfiles>
-              <activeProfile>github-packages</activeProfile>
-            </activeProfiles>
-          </settings>
-          EOF
-
       - name: Run JUnit tests
+        env:
+          GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
         run: mvn test --no-transfer-progress
 
       - name: Upload test reports
