@@ -23,6 +23,17 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Debug Settings XML
+        run: cat ./settings.xml
+
+      - name: Test Token with Curl
+        env:
+          USER: ${{ secrets.PACKAGE_USER }}
+          TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+        run: |
+          # 使用你的 Token 嘗試直接下載 Maven 的 metadata 檔案
+          curl -v -u "$USER:$TOKEN" https://github.com
+
       - name: Compile
         env:
           GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
