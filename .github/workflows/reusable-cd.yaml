@@ -11,6 +11,10 @@ on:
         type: string
         required: true
     secrets:
+      server-username:
+        required: true
+      server-password:
+        required: true
       ZEABUR_API_TOKEN:
         required: true
       ZEABUR_SERVICE_ID:
@@ -33,11 +37,16 @@ jobs:
           java-version: ${{ inputs.java-version }}
           distribution: temurin
           cache: maven
+          # 這裡的 ID 必須與您 pom.xml 裡的 <repository><id>...</id></repository> 完全一致
+          server-id: github
+          # server-username / server-password 要填「環境變數名稱」，不是秘密值本身
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Build jar (skip tests — already passed in CI)
         env:
-          GITHUB_ACTOR: ${{ secrets.PACKAGE_USER }}
-          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.server-username }}
+          MAVEN_PASSWORD: ${{ secrets.server-password }}
         run: mvn package -DskipTests --no-transfer-progress
 
       - name: Log in to GHCR

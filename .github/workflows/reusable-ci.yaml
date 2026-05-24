@@ -38,7 +38,7 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.server-username }}
           MAVEN_PASSWORD: ${{ secrets.server-password }}
-        run: cat ~/.m2/settings.xml && mvn compile --no-transfer-progress
+        run: mvn compile --no-transfer-progress
 
   test:
     name: Test (JUnit)
