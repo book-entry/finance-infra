@@ -35,7 +35,7 @@ jobs:
           cache: maven
 
       - name: Compile
-        run: mvn compile --no-transfer-progress
+        run: cat ~/.m2/settings.xml && mvn compile --no-transfer-progress
 
   test:
     name: Test (JUnit)
