@@ -24,7 +24,7 @@ jobs:
           cache: maven
 
       - name: Debug Settings XML
-        run: cat ./settings.xml
+        run: cat ~/.m2/settings.xml
 
       - name: Test Token with Curl
         env:
