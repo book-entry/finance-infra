@@ -74,9 +74,6 @@ jobs:
           ZEABUR_SERVICE_ID: ${{ secrets.ZEABUR_SERVICE_ID }}
           ZEABUR_ENVIRONMENT_ID: ${{ secrets.ZEABUR_ENVIRONMENT_ID }}
         run: |
-          echo "${ZEABUR_API_TOKEN}"
-          echo "${ZEABUR_SERVICE_ID}"
-          echo "${ZEABUR_ENVIRONMENT_ID}"s
           RESPONSE=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" \
             -X POST https://api.zeabur.com/graphql \
             -H "Authorization: Bearer ${ZEABUR_API_TOKEN}" \
